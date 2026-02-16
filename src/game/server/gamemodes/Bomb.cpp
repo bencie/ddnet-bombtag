@@ -428,7 +428,7 @@ void CGameControllerBomb::DoWinCheck()
 			else
 				EndBombRound(true);
 		}
-		if(m_aPlayers[i].m_Bomb)
+		if(m_aPlayers[i].m_Bomb && !GameServer()->m_World.m_Paused)
 		{
 			if(m_aPlayers[i].m_Tick % SERVER_TICK_SPEED == 0)
 				UpdateTimer();
