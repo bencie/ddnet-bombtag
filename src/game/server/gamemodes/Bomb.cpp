@@ -120,6 +120,9 @@ void CGameControllerBomb::DoAfkLogic()
 	if(!m_RoundActive)
 		return;
 
+	if(GameServer()->m_World.m_Paused)
+		return;
+
 	for(auto &pPlayer : GameServer()->m_apPlayers)
 	{
 		if(!pPlayer)
