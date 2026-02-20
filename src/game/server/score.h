@@ -73,10 +73,11 @@ public:
 	void LoadTeam(const char *pCode, int ClientId);
 	void GetSaves(int ClientId);
 
-	void SaveStats(const char *pName, bool Winner, int HammerKills, int CollateralKills, int RoundsSurvived);
+	void SaveStats(const char *pName, int GamesWon, int HammerKills, int CollateralKills, int RoundsSurvived);
 	void LoadPlayerGamesWon(int ClientId, const char *pName);
 	void ShowStats(int ClientId, const char *pName);
 	void ShowTopWins(int ClientId, int Offset);
+	void ClearAllStats(int ClientId);
 };
 
 #endif // GAME_SERVER_SCORE_H

@@ -538,6 +538,7 @@ private:
 	static void ConEnqueueMap(IConsole::IResult *pResult, void *pUserData);
 	static void ConStats(IConsole::IResult *pResult, void *pUserData);
 	static void ConTopWins(IConsole::IResult *pResult, void *pUserData);
+	static void ConClearAllStats(IConsole::IResult *pResult, void *pUserData);
 
 	CCharacter *GetPracticeCharacter(IConsole::IResult *pResult);
 

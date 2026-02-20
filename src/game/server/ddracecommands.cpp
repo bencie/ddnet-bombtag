@@ -9,6 +9,7 @@
 #include <game/server/player.h>
 #include <game/server/save.h>
 #include <game/server/teams.h>
+#include "score.h"
 
 bool CheckClientId(int ClientId);
 
@@ -999,5 +1000,29 @@ void CGameContext::LogEvent(const char *Description, int ClientId)
 		pNewEntry->m_ClientVersion = Server()->GetClientVersion(ClientId);
 		Server()->GetClientAddr(ClientId, pNewEntry->m_aClientAddrStr, sizeof(pNewEntry->m_aClientAddrStr));
 		str_copy(pNewEntry->m_aClientName, Server()->ClientName(ClientId));
+	}
+}
+
+void CGameContext::ConClearAllStats(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+
+	if(pSelf->Server()->GetAuthedState(pResult->m_ClientId) != AUTHED_ADMIN)
+	{
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "clearstats", "You do not have permission to run this command.");
+		return;
+	}
+
+	if(pSelf->Score())
+	{
+		pSelf->Score()->ClearAllStats(pResult->m_ClientId);
+		
+		for(int i = 0; i < MAX_CLIENTS; i++)
+		{
+			if(pSelf->m_apPlayers[i])
+			{
+				pSelf->m_apPlayers[i]->m_Score = 0;
+			}
+		}
 	}
 }

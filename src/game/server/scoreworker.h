@@ -230,7 +230,7 @@ struct CSqlSaveStats : ISqlData
 	}
 
 	char m_aName[MAX_NAME_LENGTH];
-	bool m_Winner;
+	int m_GamesWon = 0;
 	int m_CollateralKills = 0;
 	int m_HammerKills = 0;
 	int m_RoundsSurvived = 0;
@@ -331,6 +331,7 @@ struct CScoreWorker
 	static bool LoadPlayerGamesWon(IDbConnection *pSqlServer, const ISqlData *pGameData, char *pError, int ErrorSize);
 	static bool ShowStats(IDbConnection *pSqlServer, const ISqlData *pGameData, char *pError, int ErrorSize);
 	static bool ShowTopWins(IDbConnection *pSqlServer, const ISqlData *pGameData, char *pError, int ErrorSize);
+	static bool ClearAllStats(IDbConnection *pSqlServer, const ISqlData *pGameData, char *pError, int ErrorSize);
 };
 
 #endif // GAME_SERVER_SCOREWORKER_H

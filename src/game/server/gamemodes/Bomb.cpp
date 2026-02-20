@@ -389,11 +389,26 @@ void CGameControllerBomb::OnTakeDamage(int Dmg, int From, int To, int Weapon)
 		if(!pChr)
 			return;
 
-		CCharacterCore NewCore = pChr->GetCore();
-		NewCore.m_FreezeEnd = Server()->Tick() + g_Config.m_BombtagHammerFreeze;
-		NewCore.m_FreezeStart = Server()->Tick();
-		pChr->m_FreezeTime = g_Config.m_BombtagHammerFreeze;
-		pChr->SetCore(NewCore);
+		
+		if(g_Config.m_BombtagHammerRefreezeable)
+		{
+			CCharacterCore NewCore = pChr->GetCore();
+			NewCore.m_FreezeEnd = Server()->Tick() + g_Config.m_BombtagHammerFreeze;
+			NewCore.m_FreezeStart = Server()->Tick();
+			pChr->m_FreezeTime = g_Config.m_BombtagHammerFreeze;
+			pChr->SetCore(NewCore);
+		}
+		if(!g_Config.m_BombtagHammerRefreezeable)
+		{
+			if(pChr->GetCore().m_FreezeEnd <= Server()->Tick())
+			{
+			CCharacterCore NewCore = pChr->GetCore();
+			NewCore.m_FreezeEnd = Server()->Tick() + g_Config.m_BombtagHammerFreeze;
+			NewCore.m_FreezeStart = Server()->Tick();
+			pChr->m_FreezeTime = g_Config.m_BombtagHammerFreeze;
+			pChr->SetCore(NewCore);
+			}
+		}
 	}
 }
 
@@ -479,12 +494,14 @@ void CGameControllerBomb::EndBombRound(bool RealEnd)
 		return;
 
 	int Alive = 0;
+	int ScoreForSurviving = g_Config.m_BombtagScoreForSurviving;
+
 	for(auto &aPlayer : m_aPlayers)
 	{
 		if(aPlayer.m_State == STATE_ALIVE && !aPlayer.m_Bomb)
 		{
 			Alive++;
-			aPlayer.m_RoundsSurvived++;
+			aPlayer.m_RoundsSurvived += ScoreForSurviving;
 		}
 	}
 
@@ -493,9 +510,12 @@ void CGameControllerBomb::EndBombRound(bool RealEnd)
 		const int BombsPerPlayer = g_Config.m_BombtagBombsPerPlayer;
 		MakeRandomBomb(std::ceil((Alive / (float)BombsPerPlayer) - (BombsPerPlayer == 1 ? 1 : 0)));
 	}
+
 	else
 	{
 		bool WinnerAnnounced = false;
+		int ScoreForWinning = g_Config.m_BombtagScoreForWinning;
+
 		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
 			if(m_aPlayers[i].m_State == STATE_ALIVE)
@@ -503,9 +523,9 @@ void CGameControllerBomb::EndBombRound(bool RealEnd)
 				char aBuf[128];
 				str_format(aBuf, sizeof(aBuf), "'%s' won the round!", Server()->ClientName(i));
 				GameServer()->SendChat(-1, TEAM_ALL, aBuf);
-				GameServer()->m_apPlayers[i]->m_Score = GameServer()->m_apPlayers[i]->m_Score.value_or(0) + 1;
+				GameServer()->m_apPlayers[i]->m_Score = GameServer()->m_apPlayers[i]->m_Score.value_or(0) + ScoreForWinning;
 				auto pPlayer = m_aPlayers[i];
-				GameServer()->Score()->SaveStats(Server()->ClientName(i), true, pPlayer.m_HammerKills, pPlayer.m_CollateralKills, pPlayer.m_RoundsSurvived);
+				GameServer()->Score()->SaveStats(Server()->ClientName(i), ScoreForWinning, pPlayer.m_HammerKills, pPlayer.m_CollateralKills, pPlayer.m_RoundsSurvived);
 				WinnerAnnounced = true;
 				break;
 			}

@@ -1953,7 +1953,7 @@ bool CScoreWorker::GetSaves(IDbConnection *pSqlServer, const ISqlData *pGameData
 bool CScoreWorker::SaveStats(IDbConnection *pSqlServer, const ISqlData *pGameData, Write w, char *pError, int ErrorSize)
 {
 	const auto *pData = dynamic_cast<const CSqlSaveStats *>(pGameData);
-	if(pSqlServer->SaveStats(pData->m_aName, pData->m_Winner, pData->m_HammerKills, pData->m_CollateralKills, pData->m_RoundsSurvived, pError, ErrorSize))
+	if(pSqlServer->SaveStats(pData->m_aName, pData->m_GamesWon, pData->m_HammerKills, pData->m_CollateralKills, pData->m_RoundsSurvived, pError, ErrorSize))
 	{
 		return true;
 	}
@@ -2099,5 +2099,30 @@ bool CScoreWorker::ShowTopWins(IDbConnection *pSqlServer, const ISqlData *pGameD
 	}
 	str_copy(paMessages[Line], "-------------------------------", sizeof(paMessages[Line]));
 
+	return false;
+}
+
+bool CScoreWorker::ClearAllStats(IDbConnection *pSqlServer, const ISqlData *pGameData, char *pError, int ErrorSize)
+{
+	auto *pResult = dynamic_cast<CScorePlayerResult *>(pGameData->m_pResult.get());
+	auto *paMessages = pResult->m_Data.m_aaMessages;
+
+	char aBuf[512];
+	str_format(aBuf, sizeof(aBuf), "DELETE FROM %s_stats", pSqlServer->GetPrefix());
+
+	if(pSqlServer->PrepareStatement(aBuf, pError, ErrorSize))
+	{
+		return true;
+	}
+
+	int NumDeleted;
+	if(pSqlServer->ExecuteUpdate(&NumDeleted, pError, ErrorSize))
+	{
+		return true;
+	}
+
+	pResult->SetVariant(CScorePlayerResult::DIRECT);
+	str_format(paMessages[0], sizeof(paMessages[0]), "Successfully cleared %d stats records.", NumDeleted);
+	
 	return false;
 }

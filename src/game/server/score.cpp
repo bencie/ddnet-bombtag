@@ -395,11 +395,11 @@ void CScore::GetSaves(int ClientId)
 	ExecPlayerThread(CScoreWorker::GetSaves, "get saves", ClientId, "", 0);
 }
 
-void CScore::SaveStats(const char *pName, bool Winner, int HammerKills, int CollateralKills, int RoundsSurvived)
+void CScore::SaveStats(const char *pName, int GamesWon, int HammerKills, int CollateralKills, int RoundsSurvived)
 {
 	auto Tmp = std::make_unique<CSqlSaveStats>();
 	str_copy(Tmp->m_aName, pName);
-	Tmp->m_Winner = Winner;
+	Tmp->m_GamesWon = GamesWon;
 	Tmp->m_HammerKills = HammerKills;
 	Tmp->m_CollateralKills = CollateralKills;
 	Tmp->m_RoundsSurvived = RoundsSurvived;
@@ -424,4 +424,11 @@ void CScore::ShowTopWins(int ClientId, int Offset)
 	if(RateLimitPlayer(ClientId))
 		return;
 	ExecPlayerThread(CScoreWorker::ShowTopWins, "show top wins", ClientId, "", Offset);
+}
+
+void CScore::ClearAllStats(int ClientId)
+{
+	if(RateLimitPlayer(ClientId))
+		return;
+	ExecPlayerThread(CScoreWorker::ClearAllStats, "clear stats", ClientId, "", 0);
 }

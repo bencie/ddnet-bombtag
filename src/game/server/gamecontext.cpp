@@ -3684,6 +3684,7 @@ void CGameContext::OnConsoleInit()
 	// Bombtag
 	Console()->Register("reload_mysteryrounds", "", CFGFLAG_SERVER, ConReloadMysteryRounds, this, "Reload the mystery rounds");
 	Console()->Register("enqueue_map", "r[map]", CFGFLAG_SERVER, ConEnqueueMap, this, "Enqueue a map to switch to after rounds end");
+	Console()->Register("dangerous_clear_all_stats", "", CFGFLAG_SERVER, ConClearAllStats, this, "Clears all player data from the database");
 
 	Console()->Register("add_vote", "s[name] r[command]", CFGFLAG_SERVER, ConAddVote, this, "Add a voting option");
 	Console()->Register("remove_vote", "r[name]", CFGFLAG_SERVER, ConRemoveVote, this, "remove a voting option");
